@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <title>hello phaser!</title>
+        <link rel="stylesheet" href="style.css">
         <script src="phaser-2.6.2/build/phaser.min.js"></script>
     </head>
     <body>
@@ -11,31 +12,49 @@
 
     window.onload = function() {
 
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        var game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 		var cursors;
+        var player1;
+        var player2;
+        var centerX;
+        var centerY;
 
         function preload () {
-            game.load.image('logo', 'phaser.png');
-            game.load.image('s1', 'phaser.png');
+
+            game.load.image('logo', 'assets/phaser.png');
+            game.load.image('yellow', 'assets/yellow.png');
+            game.load.image('red', 'assets/red.png');
+            game.load.image('left', 'assets/left.png');
+            game.load.image('right', 'assets/right.png');
+            game.load.image('up', 'assets/up.png');
+            game.load.image('down', 'assets/down.png');
             
             cursors = game.input.keyboard.createCursorKeys();
+            centerX = game.world.centerX;
+            centerY = game.world. centerY;
         }
 
         function create () {
-            var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
+
+            var logo = game.add.sprite(centerX, centerY, 'logo');
             logo.anchor.setTo(0.5, 0.5);
-            
-            var s1 = game.add.sprite(0, game.world.centerY, 's1');
-            s1.anchor.setTo(0.5, 0.5);
-            s1.scale.setTo(0.25, 0.25);
-			
+
+            player1 = game.add.sprite(0, 0, 'yellow');
+            player1.position.setTo(player1.width / 2, centerY);
+            player1.anchor.setTo(0.5, 0.5);
+
+            player2 = game.add.sprite(0, 0, 'red');
+            player2.position.setTo(game.width - player2.width / 2, centerY);
+            player2.anchor.setTo(0.5, 0.5);
+
+            game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function() {
+                alert("AAAA");
+            });
+
         }
 		
 		function update() {
 			
-			if (cursors.left.isDown) {
-				
-			}
 		}
 
     };
