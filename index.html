@@ -18,26 +18,33 @@
         var player2;
         var centerX;
         var centerY;
+        
+        var wave;
 
         function preload () {
 
             game.load.image('logo', 'assets/phaser.png');
-            game.load.image('yellow', 'assets/yellow.png');
-            game.load.image('red', 'assets/red.png');
             game.load.image('left', 'assets/left.png');
             game.load.image('right', 'assets/right.png');
             game.load.image('up', 'assets/up.png');
             game.load.image('down', 'assets/down.png');
+
+            game.load.image('yellow', 'assets/yellow.png');
+            game.load.image('red', 'assets/red.png');
+            game.load.image('blue', 'assets/blue.png');
             
             cursors = game.input.keyboard.createCursorKeys();
             centerX = game.world.centerX;
-            centerY = game.world. centerY;
+            centerY = game.world.centerY;
         }
 
         function create () {
 
             var logo = game.add.sprite(centerX, centerY, 'logo');
             logo.anchor.setTo(0.5, 0.5);
+
+            wave = game.add.sprite(centerX, centerY, 'blue');
+            wave.anchor.setTo(0.5, 0.5);
 
             player1 = game.add.sprite(0, 0, 'yellow');
             player1.position.setTo(player1.width / 2, centerY);
@@ -47,14 +54,26 @@
             player2.position.setTo(game.width - player2.width / 2, centerY);
             player2.anchor.setTo(0.5, 0.5);
 
+            var group = game.add.group();
+            var left;
+            for (var i = 0; i < 5; i++) {
+                left = group.create(0, 0, 'left');
+            }
+            group.align(window.innerwidth - 50, left.height * 2 , left.width + 10, left.height);
+
+            group.x = 100;
+            group.y = 64;
+
             game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function() {
-                alert("AAAA");
+
             });
 
         }
 		
 		function update() {
-			
+            var deltaTime = game.time.elapsed / 1000;
+            
+            wave.position.x += 15 * deltaTime;
 		}
 
     };
