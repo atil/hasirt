@@ -15,14 +15,20 @@
 
         var game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, '', 
             { preload: preload, create: create, update: update });
+
 		var cursors;
         var player1;
         var player2;
 
         var wave;
 
-        function preload () {
+        var direction = {
+            left : 0, right : 1
+        }
 
+        var currentDirection = direction.right;
+
+        function preload () {
             game.rect = {
                 x: game.world.centerX,
                 y: game.world.centerY,
@@ -41,30 +47,64 @@
         }
 
         function create () {
-
             var logo = game.add.sprite(game.rect.x, game.rect.y, 'logo');
             logo.anchor.setTo(0.5, 0.5);
 
             player1 = game.add.sprite(0, 0, 'yellow');
             player1.position.setTo(player1.width / 2, game.rect.y);
             player1.anchor.setTo(0.5, 0.5);
+            player1.direction = direction.left;
 
             player2 = game.add.sprite(0, 0, 'red');
             player2.position.setTo(game.rect.width - player2.width / 2, game.rect.y);
             player2.anchor.setTo(0.5, 0.5);
+            player2.direction = direction.right;
 
             wave = initWave(game);
 
+            game.input.keyboard.addKey(Phaser.Keyboard.W).onDown.add(function() {
+                onKeyPress(wave, direction.left, 'up');
+            });
             game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function() {
-
+                onKeyPress(wave, direction.left, 'left');
+            });
+            game.input.keyboard.addKey(Phaser.Keyboard.S).onDown.add(function() {
+                onKeyPress(wave, direction.left, 'down');
+            });
+            game.input.keyboard.addKey(Phaser.Keyboard.D).onDown.add(function() {
+                onKeyPress(wave, direction.left, 'right');
             });
 
+            game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function() {
+                onKeyPress(wave, direction.right, 'up');
+            });
+            game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function() {
+                onKeyPress(wave, direction.right, 'left');
+            });
+            game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function() {
+                onKeyPress(wave, direction.right, 'down');
+            });
+            game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function() {
+                onKeyPress(wave, direction.right, 'right');
+            });
         }
-		
+
+        function onKeyPress(key, keyDir, keyStr) {
+            if (keyDir == currentDirection) {
+                var result = processKeyPress(wave, keyStr);
+                if (result == wave.result.complete) {
+                    currentDirection = 1 - currentDirection;
+                }
+            } else {
+                // bonus seq?
+            }
+
+        }
+
 		function update() {
             var dt = game.time.elapsed / 1000;
             
-            updateWave(wave, dt);
+            updateWave(wave, currentDirection, dt);
 		}
 
     };
