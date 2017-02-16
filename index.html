@@ -5,6 +5,7 @@
         <title>hello phaser!</title>
         <link rel="stylesheet" href="style.css">
         <script src="phaser-2.6.2/build/phaser.min.js"></script>
+        <script src="wave.js"></script>
     </head>
     <body>
 
@@ -12,57 +13,47 @@
 
     window.onload = function() {
 
-        var game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        var game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, '', 
+            { preload: preload, create: create, update: update });
 		var cursors;
         var player1;
         var player2;
-        var centerX;
-        var centerY;
-        
+
         var wave;
 
         function preload () {
 
-            game.load.image('logo', 'assets/phaser.png');
-            game.load.image('left', 'assets/left.png');
-            game.load.image('right', 'assets/right.png');
-            game.load.image('up', 'assets/up.png');
-            game.load.image('down', 'assets/down.png');
+            game.rect = {
+                x: game.world.centerX,
+                y: game.world.centerY,
+                width: game.width,
+                height: game.height,
+            }
 
+            game.load.image('logo', 'assets/phaser.png');
             game.load.image('yellow', 'assets/yellow.png');
             game.load.image('red', 'assets/red.png');
             game.load.image('blue', 'assets/blue.png');
-            
+
+            preloadWave(game);
+
             cursors = game.input.keyboard.createCursorKeys();
-            centerX = game.world.centerX;
-            centerY = game.world.centerY;
         }
 
         function create () {
 
-            var logo = game.add.sprite(centerX, centerY, 'logo');
+            var logo = game.add.sprite(game.rect.x, game.rect.y, 'logo');
             logo.anchor.setTo(0.5, 0.5);
 
-            wave = game.add.sprite(centerX, centerY, 'blue');
-            wave.anchor.setTo(0.5, 0.5);
-
             player1 = game.add.sprite(0, 0, 'yellow');
-            player1.position.setTo(player1.width / 2, centerY);
+            player1.position.setTo(player1.width / 2, game.rect.y);
             player1.anchor.setTo(0.5, 0.5);
 
             player2 = game.add.sprite(0, 0, 'red');
-            player2.position.setTo(game.width - player2.width / 2, centerY);
+            player2.position.setTo(game.rect.width - player2.width / 2, game.rect.y);
             player2.anchor.setTo(0.5, 0.5);
 
-            var group = game.add.group();
-            var left;
-            for (var i = 0; i < 5; i++) {
-                left = group.create(0, 0, 'left');
-            }
-            group.align(window.innerwidth - 50, left.height * 2 , left.width + 10, left.height);
-
-            group.x = 100;
-            group.y = 64;
+            wave = initWave(game);
 
             game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function() {
 
@@ -71,9 +62,9 @@
         }
 		
 		function update() {
-            var deltaTime = game.time.elapsed / 1000;
+            var dt = game.time.elapsed / 1000;
             
-            wave.position.x += 15 * deltaTime;
+            updateWave(wave, dt);
 		}
 
     };
