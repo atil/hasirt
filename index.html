@@ -29,7 +29,8 @@
         var currentDirection = direction.right;
 
         function preload () {
-            game.rect = {
+
+                game.rect = {
                 x: game.world.centerX,
                 y: game.world.centerY,
                 width: game.width,
@@ -59,6 +60,7 @@
             player2.position.setTo(game.rect.width - player2.width / 2, game.rect.y);
             player2.anchor.setTo(0.5, 0.5);
             player2.direction = direction.right;
+
 
             wave = initWave(game);
 
