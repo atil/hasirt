@@ -23,42 +23,46 @@ function initWave(game) {
     }
 
     wave.group = game.add.group();
-    var sampleArrow;
-    for (var i = 0; i < wave.sequence.length; i++) {
-        sampleArrow = createArrow(wave, wave.sequence[i])
-    }
 
-    wave.reAlign = function () {
-        wave.group.align((sampleArrow.width + 10) * wave.group.length,
-            sampleArrow.height * 2, 
-            sampleArrow.width + 10, 
-            sampleArrow.height);
-
-        wave.group.x = game.rect.width * 0.5 - wave.group.width * 0.5;
-        wave.group.y = game.rect.height * 0.7;
-    }
-
-    wave.reAlign();
-    wave.current = 0;
+    reset();
 
     return wave;
 }
 
+function reset(wave) {
+    wave.group.removeAll();
+    var sampleArrow;
+    for (var i = 0; i < wave.sequence.length; i++) {
+        sampleArrow = wave.group.create(0,0, wave.sequence[i]);
+    }
+    wave.group.align((sampleArrow.width + 10) * wave.group.length,
+        sampleArrow.height * 2, 
+        sampleArrow.width + 10, 
+        sampleArrow.height);
+
+    wave.group.x = game.rect.width * 0.5 - wave.group.width * 0.5;
+    wave.group.y = game.rect.height * 0.7;
+    wave.current = 0;
+}
+
 function processKeyPress(wave, key) {
     if (key == wave.sequence[wave.current]) {
-        succEffect(wave.group[wave.current]);
+        succEffect(wave.group.getAt(wave.current), key);
         wave.current++;
         return wave.result.continue;
     } else if (wave.current == wave.sequence.length) {
         wave.sequence.push(key);
-        createArrow(wave, key);
-        wave.reAlign();
-        wave.current = 0;
+        wave.group.create(0,0, key);
+        reset();
         return wave.result.complete;
     } else {
-        wave.current = 0;
+        reset();
         return wave.result.fail;
     }
+}
+
+function succEffect(sprite, dir) {
+	sprite.loadTexture(dir + "Succ");
 }
 
 function updateWave(wave, dir, dt) {
