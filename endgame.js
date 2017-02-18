@@ -7,10 +7,18 @@ function initEndgame(game) {
     endgame.width = game.rect.width;
     endgame.height = game.rect.height;
     endgame.anchor.setTo(0.5, 0.5);
-    endgame.visible = false;
+    clearEndgame(endgame);
     return endgame;
+}
+
+function clearEndgame(endgame) {
+    endgame.visible = false;
 }
 
 function showEndgame(endgame, dir) {
     endgame.visible = true;
+}
+
+function updateEndgame(endGame) {
+    
 }

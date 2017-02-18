@@ -24,6 +24,7 @@
 
         var wave;
         var endgame;
+        var isRunning = true;
 
         var direction = {
             left : 0, right : 1
@@ -92,6 +93,14 @@
             game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function() {
                 onKeyPress(direction.right, 'right');
             });
+
+            game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(function() {
+                if (!isRunning) {
+                    isRunning = true;
+                    resetWave(wave);
+                    clearEndgame(endgame);
+                }
+            });
         }
 
         function onKeyPress(keyDir, keyStr) {
@@ -108,12 +117,17 @@
 
 		function update() {
             var dt = game.time.elapsed / 1000;
-
-            if (wave.x < 0 || wave.x > game.rect.width) {
-                showEndgame(endgame, currentDirection);
+            if (isRunning) {
+                if (wave.x < 0 || wave.x > game.rect.width) {
+                    showEndgame(endgame, currentDirection);
+                    isRunning = false;
+                } else {
+                    updateWave(wave, currentDirection, dt);
+                }
             } else {
-                updateWave(wave, currentDirection, dt);
+                updateEndgame(endgame);
             }
+
 		}
 
     };
