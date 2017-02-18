@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="style.css">
         <script src="phaser-2.6.2/build/phaser.min.js"></script>
         <script src="wave.js"></script>
+        <script src="arrow.js"></script>
     </head>
     <body>
 
@@ -29,8 +30,7 @@
         var currentDirection = direction.right;
 
         function preload () {
-
-                game.rect = {
+            game.rect = {
                 x: game.world.centerX,
                 y: game.world.centerY,
                 width: game.width,

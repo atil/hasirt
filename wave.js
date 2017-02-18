@@ -3,10 +3,14 @@ function preloadWave(game) {
     game.load.image('right', 'assets/right.png');
     game.load.image('up', 'assets/up.png');
     game.load.image('down', 'assets/down.png');
+
+    game.load.image('leftSucc', 'assets/leftSucc.png');
+    game.load.image('rightSucc', 'assets/rightSucc.png');
+    game.load.image('upSucc', 'assets/upSucc.png');
+    game.load.image('downSucc', 'assets/downSucc.png');
 }
 
 function initWave(game) {
-    
     var wave = game.add.sprite(game.rect.x, game.rect.y, 'blue');
     wave.anchor.setTo(0.5, 0.5);
     wave.sequence = [
@@ -18,25 +22,23 @@ function initWave(game) {
         fail : 3,
     }
 
+    wave.group = game.add.group();
+    var sampleArrow;
+    for (var i = 0; i < wave.sequence.length; i++) {
+        sampleArrow = createArrow(wave, wave.sequence[i])
+    }
+
     wave.reAlign = function () {
-        wave.group.align((sprite.width + 10) * wave.group.length,
-            sprite.height * 2, 
-            sprite.width + 10, 
-            sprite.height);
+        wave.group.align((sampleArrow.width + 10) * wave.group.length,
+            sampleArrow.height * 2, 
+            sampleArrow.width + 10, 
+            sampleArrow.height);
 
         wave.group.x = game.rect.width * 0.5 - wave.group.width * 0.5;
         wave.group.y = game.rect.height * 0.7;
     }
 
-
-    wave.group = game.add.group();
-    var sprite;
-    for (var i = 0; i < wave.sequence.length; i++) {
-        sprite = wave.group.create(0, 0, wave.sequence[i]);
-    }
-    
     wave.reAlign();
-
     wave.current = 0;
 
     return wave;
@@ -44,11 +46,12 @@ function initWave(game) {
 
 function processKeyPress(wave, key) {
     if (key == wave.sequence[wave.current]) {
+        succEffect(wave.group[wave.current]);
         wave.current++;
         return wave.result.continue;
     } else if (wave.current == wave.sequence.length) {
         wave.sequence.push(key);
-        wave.group.create(0, 0, key);
+        createArrow(wave, key);
         wave.reAlign();
         wave.current = 0;
         return wave.result.complete;
