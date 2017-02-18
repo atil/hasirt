@@ -12,6 +12,7 @@ function preloadWave(game) {
 
 function initWave(game) {
     var wave = game.add.sprite(game.rect.x, game.rect.y, 'blue');
+    
     wave.anchor.setTo(0.5, 0.5);
     wave.sequence = [
         'up', 'down', 'left', 'right'
@@ -22,9 +23,11 @@ function initWave(game) {
         fail : 3,
     }
 
-    wave.group = game.add.group();
+    wave.worldCenterX = game.rect.x;
+    wave.worldCenterY = game.rect.y;
 
-    reset();
+    wave.group = game.add.group();
+    reset(wave);
 
     return wave;
 }
@@ -40,9 +43,10 @@ function reset(wave) {
         sampleArrow.width + 10, 
         sampleArrow.height);
 
-    wave.group.x = game.rect.width * 0.5 - wave.group.width * 0.5;
-    wave.group.y = game.rect.height * 0.7;
+    wave.group.x = wave.worldCenterX - wave.group.width * 0.5;
+    wave.group.y = wave.worldCenterY * 1.4;
     wave.current = 0;
+    
 }
 
 function processKeyPress(wave, key) {
@@ -53,10 +57,10 @@ function processKeyPress(wave, key) {
     } else if (wave.current == wave.sequence.length) {
         wave.sequence.push(key);
         wave.group.create(0,0, key);
-        reset();
+        reset(wave);
         return wave.result.complete;
     } else {
-        reset();
+        reset(wave);
         return wave.result.fail;
     }
 }
@@ -66,6 +70,6 @@ function succEffect(sprite, dir) {
 }
 
 function updateWave(wave, dir, dt) {
-    var spd = (dir ? 1 : -1) * 15;
+    var spd = (dir ? 1 : -1) * 150;
     wave.position.x += spd * dt;
 }
