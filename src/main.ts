@@ -1,40 +1,49 @@
 /// <reference path="../tsDefinitions/phaser.d.ts"/>
-class SimpleGame
+
+class HasirtGame
 {
-	game:Phaser.Game;
-	
-	constructor()
-	{
-		// create our phaser game
-		// 800 - width
-		// 600 - height
-		// Phaser.AUTO - determine the renderer automatically (canvas, webgl)
-		// 'content' - the name of the container to add our game to
-		// { preload:this.preload, create:this.create} - functions to call for our states
-		this.game = new Phaser.Game( 800, 600, Phaser.AUTO, 'content', { preload:this.preload, create:this.create} );
+	game : Phaser.Game;
+	wave : Wave;
+
+	constructor() {
+		this.game = new Phaser.Game(
+					window.screen.availWidth, 
+					window.screen.availHeight, 
+					Phaser.AUTO, 'content', 
+					{ 
+						preload : this.preload, 
+						create : this.create, 
+						update : this.update
+					});
 	}
 	
-	preload()
-	{
-		// add our logo image to the assets class under the
-		// key 'logo'. We're also setting the background colour
-		// so it's the same as the background colour in the image
-		this.game.load.image( 'logo', "assets/phaser.png" );
-		this.game.stage.backgroundColor = 0xB20059;
+	preload() {
+		this.game.load.image('logo', "assets/phaser.png");
+		this.game.load.image('left', 'assets/left.png');
+        this.game.load.image('right', 'assets/right.png');
+        this.game.load.image('up', 'assets/up.png');
+        this.game.load.image('down', 'assets/down.png');
+        this.game.load.image('leftSucc', 'assets/leftSucc.png');
+        this.game.load.image('rightSucc', 'assets/rightSucc.png');
+        this.game.load.image('upSucc', 'assets/upSucc.png');
+        this.game.load.image('downSucc', 'assets/downSucc.png');
+        this.game.load.image('blue', 'assets/blue.png');
+		// this.game.stage.backgroundColor = 0xB20059;
 	}
 	
-	create()
-	{
-		// add the 'logo' sprite to the game, position it in the
-		// center of the screen, and set the anchor to the center of
-		// the image so it's centered properly. There's a lot of
-		// centering in that last sentence
-		var logo = this.game.add.sprite( this.game.world.centerX, this.game.world.centerY, 'logo' );
-		logo.anchor.setTo( 0.5, 0.5 );
+	create() {
+		// var logo = this.game.add.sprite( this.game.world.centerX, this.game.world.centerY, 'logo' );
+		// logo.anchor.setTo( 0.5, 0.5 );
+		
+		this.wave = new Wave(this.game);
+	}
+
+	update() {
+		var dt = this.game.time.elapsed / 1000;
+		this.wave.update(dt);
 	}
 }
 
-// when the page has finished loading, create our game
 window.onload = () => {
-	var game = new SimpleGame();
+	var h = new HasirtGame();
 }
