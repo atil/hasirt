@@ -1,13 +1,9 @@
 /// <reference path="../tsDefinitions/phaser.d.ts"/>
-var HasirtGame = (function () {
-    function HasirtGame() {
-        this.game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, 'content', {
-            preload: this.preload,
-            create: this.create,
-            update: this.update
-        });
+var HasirtContext = (function () {
+    function HasirtContext() {
+        this.game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, 'content', this);
     }
-    HasirtGame.prototype.preload = function () {
+    HasirtContext.prototype.preload = function () {
         this.game.load.image('logo', "assets/phaser.png");
         this.game.load.image('left', 'assets/left.png');
         this.game.load.image('right', 'assets/right.png');
@@ -19,50 +15,44 @@ var HasirtGame = (function () {
         this.game.load.image('downSucc', 'assets/downSucc.png');
         this.game.load.image('blue', 'assets/blue.png');
     };
-    HasirtGame.prototype.create = function () {
+    HasirtContext.prototype.create = function () {
         this.wave = new Wave(this.game);
-        var f = function (d, k) {
-            this.onKeyReceived(d, k);
-        };
-        var g = f.bind(HasirtGame.prototype);
         this.game.input.keyboard.addKey(Phaser.Keyboard.W).onDown.add(function () {
-            console.log(this.wave);
-            HasirtGame.prototype.onKeyReceived(Direction.ToRight, 'up');
-        });
+            this.onKeyReceived(Direction.ToRight, 'up');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToRight, 'left');
-        });
+            this.onKeyReceived(Direction.ToRight, 'left');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.S).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToRight, 'down');
-        });
+            this.onKeyReceived(Direction.ToRight, 'down');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.D).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToRight, 'right');
-        });
+            this.onKeyReceived(Direction.ToRight, 'right');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToLeft, 'up');
-        });
+            this.onKeyReceived(Direction.ToLeft, 'up');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToLeft, 'left');
-        });
+            this.onKeyReceived(Direction.ToLeft, 'left');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToLeft, 'down');
-        });
+            this.onKeyReceived(Direction.ToLeft, 'down');
+        }, this);
         this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function () {
-            HasirtGame.prototype.onKeyReceived(Direction.ToLeft, 'right');
-        });
+            this.onKeyReceived(Direction.ToLeft, 'right');
+        }, this);
     };
-    HasirtGame.prototype.lol = function () { console.log("lol called"); };
-    HasirtGame.prototype.update = function () {
+    HasirtContext.prototype.update = function () {
         var dt = this.game.time.elapsed / 1000;
         this.wave.update(dt);
     };
-    HasirtGame.prototype.onKeyReceived = function (sender, key) {
+    HasirtContext.prototype.onKeyReceived = function (sender, key) {
         this.wave.processCommand(sender, key);
     };
-    return HasirtGame;
+    return HasirtContext;
 }());
 window.onload = function () {
-    var h = new HasirtGame();
+    var h = new HasirtContext();
 };
 var Direction;
 (function (Direction) {
