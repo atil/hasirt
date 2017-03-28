@@ -84,7 +84,6 @@ var Wave = (function () {
         this.currentIndex = 0;
     };
     Wave.prototype.processCommand = function (sender, key) {
-        console.log(sender, key);
         if (sender == this.direction) {
             return;
         }
@@ -106,7 +105,7 @@ var Wave = (function () {
         sprite.loadTexture(key + "Succ");
     };
     Wave.prototype.update = function (dt) {
-        var spd = (this.direction == Direction.ToLeft ? 1 : -1) * 100 * dt;
+        var spd = (this.direction == Direction.ToLeft ? -1 : 1) * 100 * dt;
         this.visual.position.x += spd;
     };
     return Wave;

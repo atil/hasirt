@@ -46,8 +46,6 @@ class Wave
     }
 
     public processCommand(sender : Direction, key : string) {
-        console.log(sender, key)
-
         if (sender == this.direction) {
             return;
         }
@@ -70,7 +68,7 @@ class Wave
     }
 
     public update(dt : number) {
-        var spd = (this.direction == Direction.ToLeft ? 1 : -1) * 100 * dt;
+        var spd = (this.direction == Direction.ToLeft ? -1 : 1) * 100 * dt;
         this.visual.position.x += spd;
     }
 }
