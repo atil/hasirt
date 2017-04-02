@@ -4,6 +4,8 @@ class HasirtContext
 {
 	private game : Phaser.Game;
 	private wave : Wave;
+	private wasdPlayer : WasdPlayer;
+	private arrowsPlayer : ArrowsPlayer;
 
 	constructor() {
 		this.game = new Phaser.Game( window.screen.availWidth, window.screen.availHeight, 
@@ -21,35 +23,18 @@ class HasirtContext
         this.game.load.image('upSucc', 'assets/upSucc.png');
         this.game.load.image('downSucc', 'assets/downSucc.png');
         this.game.load.image('blue', 'assets/blue.png');
+        this.game.load.image('red', 'assets/red.png');
 	}
 	
 	create() {
 		this.wave = new Wave(this.game);
-		
-		this.game.input.keyboard.addKey(Phaser.Keyboard.W).onDown.add(function() {
-			this.onKeyReceived(Direction.ToRight, 'up');
+		this.wasdPlayer = new WasdPlayer(this.game, Direction.ToRight);
+		this.wasdPlayer.onKeyCommand.add(function() {
+			this.onKeyReceived(arguments[0], arguments[1])
 		}, this);
-		this.game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function() {
-			this.onKeyReceived(Direction.ToRight, 'left');
-		}, this);
-		this.game.input.keyboard.addKey(Phaser.Keyboard.S).onDown.add(function() {
-			this.onKeyReceived(Direction.ToRight, 'down');
-		}, this);
-		this.game.input.keyboard.addKey(Phaser.Keyboard.D).onDown.add(function() {
-			this.onKeyReceived(Direction.ToRight, 'right');
-		}, this);
-
-		this.game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function() {
-			this.onKeyReceived(Direction.ToLeft, 'up');
-		}, this);
-		this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function() {
-			this.onKeyReceived(Direction.ToLeft, 'left');
-		}, this);
-		this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function() {
-			this.onKeyReceived(Direction.ToLeft, 'down');
-		}, this);
-		this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function() {
-			this.onKeyReceived(Direction.ToLeft, 'right');
+		this.arrowsPlayer = new ArrowsPlayer(this.game, Direction.ToLeft);
+		this.arrowsPlayer.onKeyCommand.add(function() {
+			this.onKeyReceived(arguments[0], arguments[1])
 		}, this);
 	}
 

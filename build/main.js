@@ -1,3 +1,13 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /// <reference path="../tsDefinitions/phaser.d.ts"/>
 var HasirtContext = (function () {
     function HasirtContext() {
@@ -14,32 +24,17 @@ var HasirtContext = (function () {
         this.game.load.image('upSucc', 'assets/upSucc.png');
         this.game.load.image('downSucc', 'assets/downSucc.png');
         this.game.load.image('blue', 'assets/blue.png');
+        this.game.load.image('red', 'assets/red.png');
     };
     HasirtContext.prototype.create = function () {
         this.wave = new Wave(this.game);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.W).onDown.add(function () {
-            this.onKeyReceived(Direction.ToRight, 'up');
+        this.wasdPlayer = new WasdPlayer(this.game, Direction.ToRight);
+        this.wasdPlayer.onKeyCommand.add(function () {
+            this.onKeyReceived(arguments[0], arguments[1]);
         }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function () {
-            this.onKeyReceived(Direction.ToRight, 'left');
-        }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.S).onDown.add(function () {
-            this.onKeyReceived(Direction.ToRight, 'down');
-        }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.D).onDown.add(function () {
-            this.onKeyReceived(Direction.ToRight, 'right');
-        }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {
-            this.onKeyReceived(Direction.ToLeft, 'up');
-        }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function () {
-            this.onKeyReceived(Direction.ToLeft, 'left');
-        }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function () {
-            this.onKeyReceived(Direction.ToLeft, 'down');
-        }, this);
-        this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function () {
-            this.onKeyReceived(Direction.ToLeft, 'right');
+        this.arrowsPlayer = new ArrowsPlayer(this.game, Direction.ToLeft);
+        this.arrowsPlayer.onKeyCommand.add(function () {
+            this.onKeyReceived(arguments[0], arguments[1]);
         }, this);
     };
     HasirtContext.prototype.update = function () {
@@ -54,6 +49,59 @@ var HasirtContext = (function () {
 window.onload = function () {
     var h = new HasirtContext();
 };
+var Player = (function () {
+    function Player(game, dir) {
+        this.onKeyCommand = new Phaser.Signal();
+        this.direction = dir;
+        this.visual = game.add.sprite(0, game.world.centerY, 'red');
+        var xCoord = dir == Direction.ToRight ? 0 : game.world.width - this.visual.width;
+        this.visual.x = xCoord;
+    }
+    Player.prototype.dispatchCommand = function (key) {
+        this.onKeyCommand.dispatch(this.direction, key);
+    };
+    return Player;
+}());
+var WasdPlayer = (function (_super) {
+    __extends(WasdPlayer, _super);
+    function WasdPlayer(game, dir) {
+        var _this = _super.call(this, game, dir) || this;
+        game.input.keyboard.addKey(Phaser.Keyboard.W).onDown.add(function () {
+            _this.dispatchCommand('up');
+        }, _this);
+        game.input.keyboard.addKey(Phaser.Keyboard.A).onDown.add(function () {
+            _this.dispatchCommand('left');
+        }, _this);
+        game.input.keyboard.addKey(Phaser.Keyboard.S).onDown.add(function () {
+            _this.dispatchCommand('down');
+        }, _this);
+        game.input.keyboard.addKey(Phaser.Keyboard.D).onDown.add(function () {
+            _this.dispatchCommand('right');
+        }, _this);
+        return _this;
+    }
+    return WasdPlayer;
+}(Player));
+var ArrowsPlayer = (function (_super) {
+    __extends(ArrowsPlayer, _super);
+    function ArrowsPlayer(game, dir) {
+        var _this = _super.call(this, game, dir) || this;
+        game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(function () {
+            _this.dispatchCommand('up');
+        }, _this);
+        game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(function () {
+            _this.dispatchCommand('left');
+        }, _this);
+        game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(function () {
+            _this.dispatchCommand('down');
+        }, _this);
+        game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(function () {
+            _this.dispatchCommand('right');
+        }, _this);
+        return _this;
+    }
+    return ArrowsPlayer;
+}(Player));
 var Direction;
 (function (Direction) {
     Direction[Direction["ToLeft"] = 0] = "ToLeft";
