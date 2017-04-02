@@ -12,12 +12,12 @@ class MenuState extends Phaser.State
         this.game.load.image('downSucc', 'assets/downSucc.png');
         this.game.load.image('blue', 'assets/blue.png');
         this.game.load.image('red', 'assets/red.png');
+        this.game.load.image('endgame', 'assets/endgame.png');
     }
 
-    public create() : void {
-    }
-
-    public update() : void {
-
+    public init() : void {
+        this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(() => {
+            this.game.state.start('game');
+        });
     }
 }

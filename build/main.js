@@ -8,25 +8,76 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var GameState = (function () {
-    function GameState() {
+var EndgameState = (function (_super) {
+    __extends(EndgameState, _super);
+    function EndgameState() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    GameState.prototype.preload = function () {
+    EndgameState.prototype.init = function (result) {
+        var _this = this;
+        var endgame = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'endgame');
+        endgame.width = this.game.width;
+        endgame.height = this.game.height;
+        endgame.anchor.setTo(0.5, 0.5);
+        var style = { font: "bold 32px Arial", fill: "#fff",
+            boundsAlignH: "center", boundsAlignV: "middle" };
+        var winText = result == WaveUpdateResult.LeftWon ? "Left won" : "Right won";
+        var text = this.game.add.text(this.game.world.centerX, this.game.world.centerY, winText, style);
+        text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+        this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(function () {
+            _this.game.state.start('game');
+        });
     };
-    GameState.prototype.create = function () {
+    return EndgameState;
+}(Phaser.State));
+var GameState = (function (_super) {
+    __extends(GameState, _super);
+    function GameState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    GameState.prototype.init = function () {
+        this.wasdPlayer = new WasdPlayer(this.game, Direction.ToRight);
+        this.wasdPlayer.onKeyCommand.add(function () {
+            this.onKeyReceived(arguments[0], arguments[1]);
+        }, this);
+        this.arrowsPlayer = new ArrowsPlayer(this.game, Direction.ToLeft);
+        this.arrowsPlayer.onKeyCommand.add(function () {
+            this.onKeyReceived(arguments[0], arguments[1]);
+        }, this);
+        this.wave = new Wave(this.game, this.wasdPlayer.getWidth());
     };
     GameState.prototype.update = function () {
+        var dt = this.game.time.elapsed / 1000;
+        var result = this.wave.update(dt);
+        if (result != WaveUpdateResult.Continue) {
+            this.game.state.start('endgame', false, false, result);
+        }
+    };
+    GameState.prototype.onKeyReceived = function (sender, key) {
+        this.wave.processCommand(sender, key);
     };
     return GameState;
-}());
+}(Phaser.State));
 /// <reference path="../tsDefinitions/phaser.d.ts"/>
 var HasirtContext = (function () {
     function HasirtContext() {
         this.game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, 'content');
         this.game.state.add('menu', new MenuState());
+        this.game.state.add('game', new GameState());
+        this.game.state.add('endgame', new EndgameState());
         this.game.state.start('menu');
     }
-    HasirtContext.prototype.preload = function () {
+    return HasirtContext;
+}());
+window.onload = function () {
+    var h = new HasirtContext();
+};
+var MenuState = (function (_super) {
+    __extends(MenuState, _super);
+    function MenuState() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MenuState.prototype.preload = function () {
         this.game.load.image('logo', "assets/phaser.png");
         this.game.load.image('left', 'assets/left.png');
         this.game.load.image('right', 'assets/right.png');
@@ -38,46 +89,16 @@ var HasirtContext = (function () {
         this.game.load.image('downSucc', 'assets/downSucc.png');
         this.game.load.image('blue', 'assets/blue.png');
         this.game.load.image('red', 'assets/red.png');
+        this.game.load.image('endgame', 'assets/endgame.png');
     };
-    HasirtContext.prototype.create = function () {
-        this.wasdPlayer = new WasdPlayer(this.game, Direction.ToRight);
-        this.wasdPlayer.onKeyCommand.add(function () {
-            this.onKeyReceived(arguments[0], arguments[1]);
-        }, this);
-        this.arrowsPlayer = new ArrowsPlayer(this.game, Direction.ToLeft);
-        this.arrowsPlayer.onKeyCommand.add(function () {
-            this.onKeyReceived(arguments[0], arguments[1]);
-        }, this);
-        this.wave = new Wave(this.game, this.wasdPlayer.getWidth());
-    };
-    HasirtContext.prototype.update = function () {
-        var dt = this.game.time.elapsed / 1000;
-        var result = this.wave.update(dt);
-        if (result != WaveUpdateResult.Continue) {
-            // Change state
-        }
-    };
-    HasirtContext.prototype.onKeyReceived = function (sender, key) {
-        this.wave.processCommand(sender, key);
-    };
-    return HasirtContext;
-}());
-window.onload = function () {
-    var h = new HasirtContext();
-};
-var MenuState = (function () {
-    function MenuState() {
-    }
-    MenuState.prototype.preload = function () {
-        console.log('menu preload');
-    };
-    MenuState.prototype.create = function () {
-        console.log('menu create');
-    };
-    MenuState.prototype.update = function () {
+    MenuState.prototype.init = function () {
+        var _this = this;
+        this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(function () {
+            _this.game.state.start('game');
+        });
     };
     return MenuState;
-}());
+}(Phaser.State));
 var Player = (function () {
     function Player(game, dir) {
         this.onKeyCommand = new Phaser.Signal();
