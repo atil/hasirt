@@ -8,10 +8,23 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var GameState = (function () {
+    function GameState() {
+    }
+    GameState.prototype.preload = function () {
+    };
+    GameState.prototype.create = function () {
+    };
+    GameState.prototype.update = function () {
+    };
+    return GameState;
+}());
 /// <reference path="../tsDefinitions/phaser.d.ts"/>
 var HasirtContext = (function () {
     function HasirtContext() {
-        this.game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, 'content', this);
+        this.game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, Phaser.AUTO, 'content');
+        this.game.state.add('menu', new MenuState());
+        this.game.state.start('menu');
     }
     HasirtContext.prototype.preload = function () {
         this.game.load.image('logo', "assets/phaser.png");
@@ -27,7 +40,6 @@ var HasirtContext = (function () {
         this.game.load.image('red', 'assets/red.png');
     };
     HasirtContext.prototype.create = function () {
-        this.wave = new Wave(this.game);
         this.wasdPlayer = new WasdPlayer(this.game, Direction.ToRight);
         this.wasdPlayer.onKeyCommand.add(function () {
             this.onKeyReceived(arguments[0], arguments[1]);
@@ -36,10 +48,14 @@ var HasirtContext = (function () {
         this.arrowsPlayer.onKeyCommand.add(function () {
             this.onKeyReceived(arguments[0], arguments[1]);
         }, this);
+        this.wave = new Wave(this.game, this.wasdPlayer.getWidth());
     };
     HasirtContext.prototype.update = function () {
         var dt = this.game.time.elapsed / 1000;
-        this.wave.update(dt);
+        var result = this.wave.update(dt);
+        if (result != WaveUpdateResult.Continue) {
+            // Change state
+        }
     };
     HasirtContext.prototype.onKeyReceived = function (sender, key) {
         this.wave.processCommand(sender, key);
@@ -49,6 +65,19 @@ var HasirtContext = (function () {
 window.onload = function () {
     var h = new HasirtContext();
 };
+var MenuState = (function () {
+    function MenuState() {
+    }
+    MenuState.prototype.preload = function () {
+        console.log('menu preload');
+    };
+    MenuState.prototype.create = function () {
+        console.log('menu create');
+    };
+    MenuState.prototype.update = function () {
+    };
+    return MenuState;
+}());
 var Player = (function () {
     function Player(game, dir) {
         this.onKeyCommand = new Phaser.Signal();
@@ -59,6 +88,9 @@ var Player = (function () {
     }
     Player.prototype.dispatchCommand = function (key) {
         this.onKeyCommand.dispatch(this.direction, key);
+    };
+    Player.prototype.getWidth = function () {
+        return this.visual.width;
     };
     return Player;
 }());
@@ -102,16 +134,25 @@ var ArrowsPlayer = (function (_super) {
     }
     return ArrowsPlayer;
 }(Player));
+// Network players gonna be here... 
 var Direction;
 (function (Direction) {
     Direction[Direction["ToLeft"] = 0] = "ToLeft";
     Direction[Direction["ToRight"] = 1] = "ToRight";
 })(Direction || (Direction = {}));
+var WaveUpdateResult;
+(function (WaveUpdateResult) {
+    WaveUpdateResult[WaveUpdateResult["Continue"] = 0] = "Continue";
+    WaveUpdateResult[WaveUpdateResult["LeftWon"] = 1] = "LeftWon";
+    WaveUpdateResult[WaveUpdateResult["RightWon"] = 2] = "RightWon";
+})(WaveUpdateResult || (WaveUpdateResult = {}));
 var Wave = (function () {
-    function Wave(game) {
+    function Wave(game, agentWidth) {
         this.visual = game.add.sprite(game.world.centerX, game.world.centerY, 'blue');
         this.worldCenterX = game.world.centerX;
         this.worldCenterY = game.world.centerY;
+        this.leftX = agentWidth;
+        this.rightX = game.world.width - agentWidth;
         this.keyGroup = game.add.group();
         this.reset();
     }
@@ -155,6 +196,15 @@ var Wave = (function () {
     Wave.prototype.update = function (dt) {
         var spd = (this.direction == Direction.ToLeft ? -1 : 1) * 100 * dt;
         this.visual.position.x += spd;
+        if (this.visual.position.x < this.leftX) {
+            return WaveUpdateResult.RightWon;
+        }
+        else if (this.visual.position.x > this.rightX) {
+            return WaveUpdateResult.LeftWon;
+        }
+        else {
+            return WaveUpdateResult.Continue;
+        }
     };
     return Wave;
 }());

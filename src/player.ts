@@ -15,6 +15,10 @@ class Player
     protected dispatchCommand(key : string) {
         this.onKeyCommand.dispatch(this.direction, key);
     }
+
+    public getWidth() : number {
+        return this.visual.width;
+    }
 }
 
 class WasdPlayer extends Player 

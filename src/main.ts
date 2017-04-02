@@ -8,26 +8,21 @@ class HasirtContext
 	private arrowsPlayer : ArrowsPlayer;
 
 	constructor() {
-		this.game = new Phaser.Game( window.screen.availWidth, window.screen.availHeight, 
-		Phaser.AUTO, 'content', this);
+		this.game = new Phaser.Game(window.screen.availWidth, window.screen.availHeight, 
+		Phaser.AUTO, 'content');
+
+		this.game.state.add('menu', new MenuState());
+		this.game.state.add('game', new GameState());
+		this.game.state.add('endgame', new EndgameState());
+		this.game.state.start('menu');
 	}
 	
-	preload() {
-		this.game.load.image('logo', "assets/phaser.png");
-		this.game.load.image('left', 'assets/left.png');
-        this.game.load.image('right', 'assets/right.png');
-        this.game.load.image('up', 'assets/up.png');
-        this.game.load.image('down', 'assets/down.png');
-        this.game.load.image('leftSucc', 'assets/leftSucc.png');
-        this.game.load.image('rightSucc', 'assets/rightSucc.png');
-        this.game.load.image('upSucc', 'assets/upSucc.png');
-        this.game.load.image('downSucc', 'assets/downSucc.png');
-        this.game.load.image('blue', 'assets/blue.png');
-        this.game.load.image('red', 'assets/red.png');
+	preload() : void {
+		
 	}
 	
-	create() {
-		this.wave = new Wave(this.game);
+	create() : void {
+		
 		this.wasdPlayer = new WasdPlayer(this.game, Direction.ToRight);
 		this.wasdPlayer.onKeyCommand.add(function() {
 			this.onKeyReceived(arguments[0], arguments[1])
@@ -36,14 +31,21 @@ class HasirtContext
 		this.arrowsPlayer.onKeyCommand.add(function() {
 			this.onKeyReceived(arguments[0], arguments[1])
 		}, this);
+		
+		this.wave = new Wave(this.game, this.wasdPlayer.getWidth());
+		
 	}
 
-	update() {
+	update() : void {
 		var dt = this.game.time.elapsed / 1000;
-		this.wave.update(dt);
+		var result = this.wave.update(dt);
+
+		if (result != WaveUpdateResult.Continue) {
+			// Change state
+		}
 	}
 
-	onKeyReceived(sender : Direction, key : string) {
+	onKeyReceived(sender : Direction, key : string) : void {
 		this.wave.processCommand(sender, key);
 	}
 }
